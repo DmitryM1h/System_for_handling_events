@@ -17,9 +17,6 @@ namespace EventProcessor.ModelsDTO
         [Required]
         public DateTime Time { get; set; }
 
-
-        //[ForeignKey(nameof(IncidentId))]
-        //public Guid IncidentId { get; set; }
         public EventReceive() { }
 
         public EventReceive(Guid id, EventTypeEnum type, DateTime time)

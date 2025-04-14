@@ -38,7 +38,7 @@ namespace HandleEvents.EventGenerationService
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             try
             {
-                await client.PostAsync("https://localhost:7219/api/Processor/Events", content);
+                await client.PostAsync("https://localhost:7219/api/Processor/Events_From_Generator", content);
             }
             catch (HttpRequestException ex)
             {

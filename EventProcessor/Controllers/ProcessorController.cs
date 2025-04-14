@@ -18,6 +18,7 @@ namespace EventProcessor.Controllers
             _context = context;
         }
 
+        // Возвращает все инциденты без событий
         [HttpGet("Incidents")]
         public async Task<ActionResult<IEnumerable<Incident>>> GetIncidents()
         {
@@ -26,7 +27,6 @@ namespace EventProcessor.Controllers
 
         
         // Возвращает все инциденты и их события
-
         [HttpGet("Incidents_With_Events")]
         public async Task<ActionResult<IEnumerable<Incident>>> GetIncidentsEvents()
         {
@@ -73,7 +73,7 @@ namespace EventProcessor.Controllers
             return Ok(incidentDto);
         }
 
-        // Возвращает инциденты указанного типа в указанном количестве
+        // Возвращает последние инциденты указанного типа в указанном количестве
         [HttpGet("Incidents_Of_Specified_Type")]
         public async Task<ActionResult<IEnumerable<Incident>>> GetSpecifiedIncidents(int type,int limit)
         {

@@ -17,6 +17,7 @@ builder.Services.AddHostedService<EventProcessingService>(provider =>
                                                                 provider?.GetService<EventProcessingService>() ??
                                                                 throw new InvalidOperationException("EventProcessingService is not found"));
 // Подключаем бд, в моём случае PostgreSQL
+// Ссылка на подключение указана в конфигурационном файле
 builder.Services.AddDbContext<IncidentContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
         ?? throw new InvalidOperationException("Connection string not found."))); ;

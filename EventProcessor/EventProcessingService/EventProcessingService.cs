@@ -1,7 +1,5 @@
 ﻿using EventProcessor.Models;
 using System;
-
-// EventProcessor/Services/EventProcessingService.cs
 using EventProcessor.ModelsDTO;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -166,7 +164,7 @@ namespace EventProcessor
                 }
                 else
                 {
-                    Console.WriteLine("Ожидаю");
+                    Console.WriteLine("Ожидание");
                 }
                 await Task.Delay(1000, stoppingToken);
 
