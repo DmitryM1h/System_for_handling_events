@@ -9,8 +9,13 @@ namespace HandleEvents.Generator
 
         public Event Generate()
         {
+            var moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
 
-            var ev = new Event(Guid.NewGuid(), (EventTypeEnum)_random.Next(1,4), DateTime.Now.ToUniversalTime());
+            var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+
+            var utcMoscowTime = TimeZoneInfo.ConvertTimeToUtc(moscowTime, moscowTimeZone);
+
+            var ev = new Event(Guid.NewGuid(), (EventTypeEnum)_random.Next(1,4), utcMoscowTime);
             Console.WriteLine(ev);
             return ev;
 
