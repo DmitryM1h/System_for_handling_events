@@ -11,6 +11,8 @@ namespace EventProcessor
 {
     public class EventProcessingService : BackgroundService
     {
+
+        // не очень потокобезопасный вариант с использованием обычного списка
         readonly List<EventReceive> _events = [];
 
         private readonly IServiceProvider _service;
@@ -20,7 +22,7 @@ namespace EventProcessor
 
         public EventProcessingService(IServiceProvider service)
         {
-            _service = service;
+            _service = service; 
         }
 
 
@@ -29,7 +31,6 @@ namespace EventProcessor
             Console.WriteLine("Добавлен новый event" + _event);
             _events.Add(_event);
             Task.Run(() => ProcessEvent(_event));
-
         }
 
 
@@ -172,7 +173,7 @@ namespace EventProcessor
         }
         public void RemoveOldEvents()
         {
-            DateTime r = DateTime.Now.ToUniversalTime().AddSeconds(-70);
+            DateTime r = DateTime.UtcNow.AddSeconds(-70);
             var old = _events.Where(t => t.Time < r).ToList();
             if (old != null && old.Count != 0)
             {

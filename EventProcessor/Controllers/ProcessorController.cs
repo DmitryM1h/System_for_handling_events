@@ -1,4 +1,5 @@
-﻿using EventProcessor.db_context;
+﻿using System.ComponentModel.DataAnnotations;
+using EventProcessor.db_context;
 using EventProcessor.Models;
 using EventProcessor.ModelsDTO;
 using Microsoft.AspNetCore.Http;
@@ -52,6 +53,8 @@ namespace EventProcessor.Controllers
         [HttpGet("Incidents_With_Events_Limited")]
         public async Task<ActionResult<IEnumerable<Incident>>> GetIncidentsEvents(int limit)
         {
+            if(limit < 0)
+                return BadRequest("Invalid incident type.");
 
             var incidents = await _context.Incidents.Include(t => t.Events).OrderByDescending(t=>t.Time).Take(limit).ToListAsync();
 
@@ -77,7 +80,7 @@ namespace EventProcessor.Controllers
         [HttpGet("Incidents_Of_Specified_Type")]
         public async Task<ActionResult<IEnumerable<Incident>>> GetSpecifiedIncidents(int type,int limit)
         {
-           if(!Enum.IsDefined(typeof(IncidentTypeEnum), type))
+           if(!Enum.IsDefined(typeof(IncidentTypeEnum), type)  || limit < 0)
             {
                 return BadRequest("Invalid incident type.");
             }
