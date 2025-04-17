@@ -16,19 +16,21 @@ namespace EventProcessor
         readonly List<EventReceive> _events = [];
 
         private readonly IServiceProvider _service;
+        private readonly ILogger _logger;
 
         bool waiting_for_type1 = false;
         bool waiting_for_type2 = false;
 
-        public EventProcessingService(IServiceProvider service)
+        public EventProcessingService(IServiceProvider service, ILogger<EventProcessingService> logger)
         {
             _service = service; 
+            _logger = logger;
         }
 
 
         public void AddEvent(EventReceive _event)
         {
-            Console.WriteLine("Добавлен новый event" + _event);
+            _logger.LogInformation("Добавлен новый event\n" + _event);
             _events.Add(_event);
 
             if (_event.Type == EventTypeEnum.Type1 && waiting_for_type1)
@@ -67,7 +69,7 @@ namespace EventProcessor
         {
             if (waiting_for_type1) return;
 
-            Console.WriteLine("Возвращаю type1 сразу");
+            _logger.LogInformation("type1 обработан");
             var incident = new Incident(_event);
             var ev = new Event(_event) { IncidentId = incident.Id };
 
@@ -134,25 +136,24 @@ namespace EventProcessor
             await _context.SaveChangesAsync();
         }
 
-        public async Task<EventReceive?> Wait_for_event(EventReceive _event,EventTypeEnum type)
+        public Task<EventReceive?> Wait_for_event(EventReceive _event,EventTypeEnum type)
         {
             int index = _events.IndexOf(_event);
             int seconds = type == EventTypeEnum.Type1 ? 20 : 60;
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(seconds));
+            _logger.LogInformation($"Ожидаем type {type} в течение {seconds} секунд");
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                Console.WriteLine($"Ожидаем type {type}");
                 var newEvents = _events.Skip(index + 1).Where(e => e.Type == type).ToList();
                 var exists = newEvents.FirstOrDefault();
                 if (exists != null)
                 {
-                    Console.WriteLine($"type {type} найден!");
-                    return exists;
+                    _logger.LogInformation($"type {type} найден!");
+                    return Task.FromResult<EventReceive?>(exists);
                 }
-                await Task.Delay(500);
             }
-            Console.WriteLine($"Время ожидания истекло. Событие типа {type} не найдено.");
-            return null;
+            _logger.LogInformation($"Время ожидания истекло. Событие типа {type} не найдено.");
+            return Task.FromResult<EventReceive?>(null);
         }
         
 
@@ -162,17 +163,7 @@ namespace EventProcessor
             {
                 RemoveOldEvents();
 
-                if (_events.Any())
-                {
-                    Console.WriteLine("Contains : ");
-                    foreach (var ev in _events)
-                        Console.WriteLine($"{ev}");
-
-                }
-                else
-                {
-                    Console.WriteLine("Ожидание");
-                }
+     
                 await Task.Delay(1000, stoppingToken);
 
             }
@@ -183,7 +174,7 @@ namespace EventProcessor
             var old = _events.Where(t => t.Time < r).ToList();
             if (old != null && old.Count != 0)
             {
-                Console.WriteLine("Очистка обработанных событий");
+                _logger.LogInformation("Очистка обработанных событий");
                 _events.RemoveAll(e => e.Time < r);
             }
         }
