@@ -30,6 +30,12 @@ namespace EventProcessor
         {
             Console.WriteLine("Добавлен новый event" + _event);
             _events.Add(_event);
+
+            if (_event.Type == EventTypeEnum.Type1 && waiting_for_type1)
+                return;
+            if (_event.Type == EventTypeEnum.Type2 && waiting_for_type2)
+                return;
+
             Task.Run(() => ProcessEvent(_event));
         }
 
