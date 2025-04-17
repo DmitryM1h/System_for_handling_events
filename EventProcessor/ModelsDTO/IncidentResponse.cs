@@ -12,7 +12,7 @@ namespace EventProcessor.ModelsDTO
     public class IncidentResponse
     {
         public Guid Incident_Id { get; set; } 
-        public List<EventDto> Events { get; set; } = new List<EventDto>();
+        public List<EventDto> Events { get; set; } = [];
 
         public IncidentTypeEnum Type { get; set; }
 

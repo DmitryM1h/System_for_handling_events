@@ -13,13 +13,13 @@ namespace EventProcessor
     {
 
         // не очень потокобезопасный вариант с использованием обычного списка
-        readonly List<EventReceive> _events = [];
+        private readonly List<EventReceive> _events = [];
 
         private readonly IServiceProvider _service;
         private readonly ILogger _logger;
 
-        bool waiting_for_type1 = false;
-        bool waiting_for_type2 = false;
+        private bool waiting_for_type1 = false;
+        private bool waiting_for_type2 = false;
 
         public EventProcessingService(IServiceProvider service, ILogger<EventProcessingService> logger)
         {
@@ -44,24 +44,22 @@ namespace EventProcessor
 
         public async Task ProcessEvent(EventReceive _event)
         {
-            using (var scope = _service.CreateScope())
+            using var scope = _service.CreateScope();
+            var _context = scope.ServiceProvider.GetRequiredService<IncidentContext>();
+
+            switch (_event.Type)
             {
-                var _context = scope.ServiceProvider.GetRequiredService<IncidentContext>();
+                case EventTypeEnum.Type1:
+                    await HandleType1Event(_event, _context);
+                    break;
 
-                switch (_event.Type)
-                {
-                    case EventTypeEnum.Type1:
-                        await HandleType1Event(_event, _context);
-                        break;
+                case EventTypeEnum.Type2:
+                    await HandleType2Event(_event, _context);
+                    break;
 
-                    case EventTypeEnum.Type2:
-                        await HandleType2Event(_event, _context);
-                        break;
-
-                    case EventTypeEnum.Type3:
-                        await HandleType3Event(_event, _context);
-                        break;
-                }
+                case EventTypeEnum.Type3:
+                    await HandleType3Event(_event, _context);
+                    break;
             }
         }
 
@@ -113,8 +111,8 @@ namespace EventProcessor
             }
             waiting_for_type2 = false;
         }
-         
-        private async Task CreateIncidentWithEvents(EventReceive _event, EventReceive resultEvent, IncidentContext _context)
+
+        private static async Task CreateIncidentWithEvents(EventReceive _event, EventReceive resultEvent, IncidentContext _context)
         {
             var incident = new Incident(_event);
             var ev1 = new Event(_event) { IncidentId = incident.Id };
@@ -125,8 +123,7 @@ namespace EventProcessor
             await _context.Events.AddAsync(ev2);
             await _context.SaveChangesAsync();
         }
-
-        private async Task CreateDefaultIncident(EventReceive _event, IncidentTypeEnum incidentType, IncidentContext _context)
+        private static async Task CreateDefaultIncident(EventReceive _event, IncidentTypeEnum incidentType, IncidentContext _context)
         {
             var incident = new Incident(_event) { Type = incidentType };
             var ev = new Event(_event) { IncidentId = incident.Id };
@@ -146,6 +143,7 @@ namespace EventProcessor
             {
                 var newEvents = _events.Skip(index + 1).Where(e => e.Type == type).ToList();
                 var exists = newEvents.FirstOrDefault();
+
                 if (exists != null)
                 {
                     _logger.LogInformation($"type {type} найден!");
@@ -163,9 +161,7 @@ namespace EventProcessor
             {
                 RemoveOldEvents();
 
-     
                 await Task.Delay(1000, stoppingToken);
-
             }
         }
         public void RemoveOldEvents()

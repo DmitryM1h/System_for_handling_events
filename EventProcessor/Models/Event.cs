@@ -33,7 +33,7 @@ namespace EventProcessor.Models
 
         public Event(EventReceive ev)
         {
-            Id = ev.Id;
+            Id = Guid.NewGuid();
             Type = ev.Type;
             Time = ev.Time;
         }
@@ -46,7 +46,7 @@ namespace EventProcessor.Models
         }
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine($"Event ID: {Id}");
             sb.AppendLine($"Event Type: {Type}");
             sb.AppendLine($"Event Time: {Time}");

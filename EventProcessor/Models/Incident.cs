@@ -43,7 +43,7 @@ namespace EventProcessor.Models
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine($"Id: {Id}");
             sb.AppendLine($"Type: {Type}");
             sb.AppendLine($"Time: {Time}");
