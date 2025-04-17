@@ -33,7 +33,7 @@ namespace EventProcessor.Models
 
         public Event(EventReceive ev)
         {
-            Id = Guid.NewGuid();
+            Id = ev.Id;
             Type = ev.Type;
             Time = ev.Time;
         }
