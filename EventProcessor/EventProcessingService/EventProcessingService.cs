@@ -12,7 +12,6 @@ namespace EventProcessor
     public class EventProcessingService : BackgroundService
     {
 
-        // не очень потокобезопасный вариант с использованием обычного списка
         private readonly List<EventReceive> _events = [];
 
         private readonly IServiceProvider _service;
@@ -65,8 +64,6 @@ namespace EventProcessor
 
         private async Task HandleType1Event(EventReceive _event, IncidentContext _context)
         {
-            if (waiting_for_type1) return;
-
             _logger.LogInformation("type1 обработан");
             var incident = new Incident(_event);
             var ev = new Event(_event) { IncidentId = incident.Id };
@@ -78,11 +75,12 @@ namespace EventProcessor
 
         private async Task HandleType2Event(EventReceive _event, IncidentContext _context)
         {
-            if (waiting_for_type2) return;
 
             waiting_for_type1 = true;
             var task = Wait_for_event(_event, EventTypeEnum.Type1);
             await task;
+            waiting_for_type1 = false;
+
 
             if (task.Result != null)
             {
@@ -92,7 +90,6 @@ namespace EventProcessor
             {
                 await CreateDefaultIncident(_event, IncidentTypeEnum.Type1, _context);
             }
-            waiting_for_type1 = false;
         }
 
         private async Task HandleType3Event(EventReceive _event, IncidentContext _context)
@@ -100,6 +97,8 @@ namespace EventProcessor
             waiting_for_type2 = true;
             var task = Wait_for_event(_event, EventTypeEnum.Type2);
             await task;
+            waiting_for_type2 = false;
+
 
             if (task.Result != null)
             {
@@ -109,7 +108,6 @@ namespace EventProcessor
             {
                 await CreateDefaultIncident(_event, IncidentTypeEnum.Type1, _context);
             }
-            waiting_for_type2 = false;
         }
 
         private static async Task CreateIncidentWithEvents(EventReceive _event, EventReceive resultEvent, IncidentContext _context)
