@@ -26,7 +26,7 @@ namespace EventProcessor.Models
 
 
         [Required]
-        public virtual List<Event> Events { get; set; } = new List<Event> ();
+        public virtual List<Event> Events { get; set; } = [];
 
         public Incident(Guid id,IncidentTypeEnum type, DateTime time)
         {

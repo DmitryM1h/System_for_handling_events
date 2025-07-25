@@ -43,6 +43,7 @@ namespace HandleEvents.EventGenerationService
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"Ошибка при отправке события: {ex.Message}");
+                throw;
             }
         }
     }
