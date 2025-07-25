@@ -6,16 +6,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Threading.Tasks;
 using EventProcessor.db_context;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace EventProcessor
 {
     public class EventProcessingService : BackgroundService
     {
-
-        private readonly List<EventReceive> _events = [];
+        private readonly ConcurrentBag <EventReceive> _events = [];
 
         private readonly IServiceProvider _service;
         private readonly ILogger _logger;
+
 
         private bool waiting_for_type1 = false;
         private bool waiting_for_type2 = false;
@@ -24,6 +25,7 @@ namespace EventProcessor
         {
             _service = service; 
             _logger = logger;
+      
         }
 
 
@@ -98,7 +100,6 @@ namespace EventProcessor
             var task = Wait_for_event(_event, EventTypeEnum.Type2);
             await task;
             waiting_for_type2 = false;
-
 
             if (task.Result != null)
             {
