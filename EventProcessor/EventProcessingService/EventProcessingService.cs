@@ -12,7 +12,9 @@ namespace EventProcessor
 {
     public class EventProcessingService : BackgroundService
     {
-        private readonly ConcurrentBag <EventReceive> _events = [];
+        //private readonly ConcurrentBag <EventReceive> _events = [];
+        private readonly List<EventReceive> _events = [];
+
 
         private readonly IServiceProvider _service;
         private readonly ILogger _logger;
