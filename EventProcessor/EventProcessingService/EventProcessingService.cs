@@ -140,7 +140,7 @@ namespace EventProcessor
             _logger.LogInformation($"Ожидаем type {type} в течение {seconds} секунд");
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                var newEvents = _events.Skip(index + 1).Where(e => e.Type == type).ToList();
+                var newEvents = _events.Skip(index + 1).Where(e => e.Type == type).ToList(); // TODO уйти от этого ужаса в сторону словарика или еще чего-либо
                 var exists = newEvents.FirstOrDefault();
 
                 if (exists != null)
